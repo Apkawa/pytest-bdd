@@ -2,6 +2,7 @@
 
 import pytest
 
+from pytest_bdd.feature import force_bytes
 from . import given, when, then
 from . import cucumber_json
 from . import generation
@@ -53,6 +54,11 @@ def pytest_unconfigure(config):
 def pytest_runtest_makereport(item, call):
     outcome = yield
     reporting.runtest_makereport(item, call, outcome.get_result())
+
+
+def pytest_make_parametrize_id(config, val):
+    if isinstance(val, basestring):
+        return force_bytes(val)
 
 
 @pytest.mark.tryfirst

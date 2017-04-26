@@ -36,10 +36,8 @@ import six
 from . import types
 from . import exceptions
 
-
 # Global features dictionary
 features = {}
-
 
 STEP_PREFIXES = [
     ("Feature: ", types.FEATURE),
@@ -127,6 +125,37 @@ def force_encode(string, encoding="utf-8"):
     return string
 
 
+def force_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
+    """
+    Similar to smart_bytes, except that lazy instances are resolved to
+    strings, rather than kept as lazy objects.
+
+    If strings_only is True, don't convert (some) non-string-like objects.
+    """
+    # Handle the common case first for performance reasons.
+    if isinstance(s, bytes):
+        if encoding == 'utf-8':
+            return s
+        else:
+            return s.decode('utf-8', errors).encode(encoding, errors)
+    if not isinstance(s, six.string_types):
+        try:
+            if six.PY3:
+                return six.text_type(s).encode(encoding)
+            else:
+                return bytes(s)
+        except UnicodeEncodeError:
+            if isinstance(s, Exception):
+                # An Exception subclass containing non-ASCII data that doesn't
+                # know how to print itself properly. We shouldn't raise a
+                # further exception.
+                return b' '.join(force_bytes(arg, encoding, strings_only, errors)
+                                 for arg in s)
+            return six.text_type(s).encode(encoding, errors)
+    else:
+        return s.encode(encoding, errors)
+
+
 def get_tags(line):
     """Get tags out of the given line.
 
@@ -169,7 +198,6 @@ def get_features(paths, **kwargs):
 
 
 class Examples(object):
-
     """Example table."""
 
     def __init__(self):
@@ -246,7 +274,6 @@ class Examples(object):
 
 
 class Feature(object):
-
     """Feature."""
 
     def __init__(self, basedir, filename, encoding="utf-8", strict_gherkin=True):
@@ -408,7 +435,6 @@ class Feature(object):
 
 
 class Scenario(object):
-
     """Scenario."""
 
     def __init__(self, feature, name, line_number, example_converters=None, tags=None):
@@ -486,7 +512,6 @@ class Scenario(object):
 
 @six.python_2_unicode_compatible
 class Step(object):
-
     """Step."""
 
     def __init__(self, name, type, indent, line_number, keyword):
@@ -539,7 +564,6 @@ class Step(object):
 
 
 class Background(object):
-
     """Background."""
 
     def __init__(self, feature, line_number):

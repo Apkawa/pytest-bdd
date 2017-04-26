@@ -43,3 +43,4 @@ def pytest_bdd_apply_tag(tag, function):
     ``getattr(pytest.mark, tag)(function)``, but you can override this hook and
     return ``True`` to do more sophisticated handling of tags.
     """
+
