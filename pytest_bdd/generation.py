@@ -66,7 +66,7 @@ def generate_code(features, scenarios, steps):
     grouped_steps = group_steps(steps)
     template = template_lookup.get_template("test.py.mak")
     return template.render(
-        features=features, scenarios=scenarios, steps=grouped_steps, make_python_name=make_func_name())
+        features=features, scenarios=scenarios, steps=grouped_steps, make_python_name=make_func_name)
 
 
 def show_missing_code(config):
