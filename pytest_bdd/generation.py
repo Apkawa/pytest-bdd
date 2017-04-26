@@ -4,7 +4,7 @@ import itertools
 import os.path
 
 try:
-    from pytils.translit import _slugify
+    from pytils.translit import slugify as _slugify
 except ImportError:
     _slugify = lambda text: text
 
