@@ -12,6 +12,27 @@ def test_python_name_generator():
     itertools.islice(get_python_name_generator('Some name'), 2) == ['some_name', 'some_name_2']
 
 
+def test_generate_only_scenario(testdir):
+    dirname = "test_generate_missing"
+    tests = testdir.mkpydir(dirname)
+    with open(os.path.join(os.path.dirname(__file__), "generation.feature")) as fd:
+        tests.join('generation.feature').write(fd.read())
+
+    tests.join("test_foo.py").write(py.code.Source("""
+        import functools
+
+        from pytest_bdd import scenario, given
+
+        scenario = functools.partial(scenario, "generation.feature")
+
+    """))
+
+    result = testdir.runpytest(dirname, "--generate-missing", "--generate-scenario", "--feature",
+        tests.join('generation.feature').strpath)
+
+    pass
+
+
 def test_generate_missing(testdir):
     """Test generate missing command."""
     dirname = "test_generate_missing"

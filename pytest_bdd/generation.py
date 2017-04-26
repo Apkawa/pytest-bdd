@@ -3,6 +3,11 @@
 import itertools
 import os.path
 
+try:
+    from pytils.translit import _slugify
+except ImportError:
+    _slugify = lambda text: text
+
 from mako.lookup import TemplateLookup
 import py
 
@@ -14,8 +19,11 @@ from .steps import get_step_fixture_name
 from .feature import get_features
 from .types import STEP_TYPES
 
-
 template_lookup = TemplateLookup(directories=[os.path.join(os.path.dirname(__file__), "templates")])
+
+
+def make_func_name(text):
+    return make_python_name(_slugify(text))
 
 
 def add_options(parser):
@@ -28,6 +36,14 @@ def add_options(parser):
         dest="generate_missing",
         default=False,
         help="Generate missing bdd test code for given feature files and exit.",
+    )
+
+    group._addoption(
+        "--generate-scenario",
+        action="store_true",
+        dest="generate_scenario",
+        default=False,
+        help="Generate only scenarios.",
     )
 
     group._addoption(
@@ -50,7 +66,7 @@ def generate_code(features, scenarios, steps):
     grouped_steps = group_steps(steps)
     template = template_lookup.get_template("test.py.mak")
     return template.render(
-        features=features, scenarios=scenarios, steps=grouped_steps, make_python_name=make_python_name)
+        features=features, scenarios=scenarios, steps=grouped_steps, make_python_name=make_func_name())
 
 
 def show_missing_code(config):
@@ -170,6 +186,8 @@ def _show_missing_code_main(config, session):
         session.exitstatus = 100
         return
 
+    is_only_scenario = config.option.generate_scenario
+
     features, scenarios, steps = parse_feature_files(config.option.features)
 
     for item in session.items:
@@ -188,7 +206,10 @@ def _show_missing_code_main(config, session):
         for step in scenario.steps:
             if step.background is None:
                 steps.remove(step)
-    grouped_steps = group_steps(steps)
+    grouped_steps = []
+    if not is_only_scenario:
+        grouped_steps = group_steps(steps)
+
     print_missing_code(scenarios, grouped_steps)
 
     if scenarios or steps:
