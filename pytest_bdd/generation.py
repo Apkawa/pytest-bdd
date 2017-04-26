@@ -23,7 +23,7 @@ template_lookup = TemplateLookup(directories=[os.path.join(os.path.dirname(__fil
 
 
 def make_func_name(text):
-    return make_python_name(_slugify(text))
+    return make_python_name(_slugify(text).replace('-', '_'))
 
 
 def add_options(parser):
