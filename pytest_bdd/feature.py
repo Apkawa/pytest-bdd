@@ -530,7 +530,7 @@ class Step(object):
 
     def __str__(self):
         """Full step name including the type."""
-        return '{type} "{name}"'.format(type=self.type.capitalize(), name=self.name)
+        return six.text_type('{type} "{name}"').format(type=self.type.capitalize(), name=self.name)
 
     @property
     def params(self):

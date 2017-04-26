@@ -1,5 +1,5 @@
 # -*- encoding: utf-8 -*-
-
+import six
 from _pytest.terminal import TerminalReporter
 
 
@@ -89,7 +89,7 @@ class GherkinTerminalReporter(TerminalReporter):
                 self._tw.write(report.scenario['name'], **scenario_markup)
                 self._tw.write('\n')
                 for step in report.scenario['steps']:
-                    self._tw.write('        {} {}\n'.format(step['keyword'],
+                    self._tw.write(six.text_type('        {} {}\n').format(step['keyword'],
                                                             step['name']), **scenario_markup)
                 self._tw.write('    ' + word, **word_markup)
                 self._tw.write('\n\n')

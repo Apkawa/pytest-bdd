@@ -24,6 +24,11 @@ def test_steps_in_py_file_have_unicode():
     pass
 
 
+@scenario(u'Дополнительный сценарий на проверку юникода')
+def test_full_unicode():
+    pass
+
+
 pattern = '(?P<content>\'\w+\')'
 
 
@@ -43,6 +48,17 @@ def there_is_a_string_with_content(content, string):
 def there_is_an_other_string_with_content(string):
     """Create other string with unicode content."""
     string['content'] = u"с каким-то контентом"
+
+
+@given(parsers.cfparse(u"Строка '{content}'"))
+def there_string_with_content(content, string):
+    """Create other string with unicode content."""
+    string['content'] = content
+
+
+@then(parsers.cfparse(u"Содержит строку '{content}'"))
+def assert_contains(content, string):
+    assert content in string['content']
 
 
 @then("I should see that the other string equals to content 'якийсь контент'")
